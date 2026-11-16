@@ -1,0 +1,141 @@
+name: Issue 转 PR
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+env:
+  BRANCH: ""
+
+jobs:
+  convert:
+    if: contains(github.event.issue.labels.*.name, 'needs-triage')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 解析 Issue 表单
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+
+            const getField = (name) => {
+              const re = new RegExp(
+                '### ' + name + '\n+([\s\S]*?)(?=\n### |$)',
+                'i'
+              );
+              const m = body.match(re);
+              return m ? m[1].trim() : '';
+            };
+
+            const category = getField('分类');
+            const title = getField('文档标题');
+            const description = getField('简述');
+            const authorsRaw = getField('作者 GitHub 用户名');
+            const maintainersRaw = getField('维护者 GitHub 用户名');
+            const content = getField('正文');
+            const outdatedChecked = body.includes(
+              '[x] 本文档内容已过时'
+            );
+
+            const authors = authorsRaw
+              .split(',')
+              .map(s => s.trim())
+              .filter(Boolean);
+            const maintainers = maintainersRaw
+              .split(',')
+              .map(s => s.trim())
+              .filter(Boolean);
+
+            const valid = ['电机','通信协议','控制算法','石山代码'];
+            if (!valid.includes(category)) {
+              core.setFailed('分类无效: ' + category);
+            }
+
+            const slug = title
+              .toLowerCase()
+              .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
+              .replace(/^-+|-+$/g, '');
+
+            const today = new Date().toISOString().slice(0, 10);
+            const fm = [
+              '---',
+              'title: ' + JSON.stringify(title),
+              'description: ' + JSON.stringify(description),
+              'authors: [' +
+                authors.map(a => JSON.stringify(a)).join(', ') +
+                ']',
+              'maintainers: [' +
+                maintainers.map(m => JSON.stringify(m)).join(', ') +
+                ']',
+              'lastUpdated: ' + today,
+              'outdated: ' + outdatedChecked,
+              '---',
+            ].join('\n');
+
+            const full = fm + '\n\n' + content;
+
+            const fs = require('fs');
+            const path =
+              'src/content/docs/' + category + '/' + slug + '.md';
+            fs.mkdirSync(require('path').dirname(path), {
+              recursive: true,
+            });
+            fs.writeFileSync(path, full);
+
+            core.setOutput('path', path);
+            core.setOutput('title', title);
+            core.setOutput('category', category);
+            core.setOutput('slug', slug);
+            core.setOutput('issue_number', issue.number);
+
+      - name: 创建分支并提交
+        env:
+          ISSUE_NUMBER: ${{ steps.parse.outputs.issue_number }}
+          DOC_SLUG: ${{ steps.parse.outputs.slug }}
+          DOC_CATEGORY: ${{ steps.parse.outputs.category }}
+          DOC_TITLE: ${{ steps.parse.outputs.title }}
+          DOC_PATH: ${{ steps.parse.outputs.path }}
+        run: bash .github/scripts/issue-to-pr.sh
+
+      - name: 创建 PR
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        env:
+          ISSUE_NUMBER: ${{ steps.parse.outputs.issue_number }}
+          DOC_TITLE: ${{ steps.parse.outputs.title }}
+        with:
+          script: |
+            const issueNum = Number(process.env.ISSUE_NUMBER);
+            const title = process.env.DOC_TITLE;
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '[提交] ' + title,
+              head: process.env.BRANCH,
+              base: 'main',
+              body:
+                '自动由 Issue #' + issueNum + ' 转入库。' +
+                '\n\n请 review 后合并。',
+            });
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNum,
+              body:
+                '✅ 已自动转为 PR #' + pr.number +
+                '，请在该 PR 中 review 并合并。',
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNum,
+              state: 'closed',
+            });

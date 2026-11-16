@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 在线修改现有文档
+    url: >-
+      https://github.com/QianLi2027/concise-guide-to-debugging/edit/main/src/content/docs/
+    about: 直接编辑现有文档，适合快速修改

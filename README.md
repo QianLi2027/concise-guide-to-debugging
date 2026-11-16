@@ -75,6 +75,22 @@ tags: ['rs485', '时序']       # 可选
 
 push 到 `main` 后，GitHub Actions 自动跑门禁并部署到 Pages。
 
+## 快速提交
+
+### 方式 1: 网页提交（零安装）
+
+点击站点首页"提交文档"按钮，或访问 [Issue 表单](https://github.com/QianLi2027/concise-guide-to-debugging/issues/new?template=submit-doc.yml)。
+
+### 方式 2: CLI 提交（本地快速）
+
+```bash
+npm install -g @qianli2027/eabi-debug-cli
+eabi-debug validate ./新文档.md
+eabi-debug submit ./新文档.md
+```
+
+详见 [CLI 文档](./cli/README.md)。
+
 ## 规范文档
 
 - **提交规范**：[CONTRIBUTING.md](./CONTRIBUTING.md) —— 分支策略、commit message 格式、front matter 契约、CI 门禁

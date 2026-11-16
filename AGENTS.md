@@ -43,6 +43,12 @@
 - 警示用 Starlight aside：`:::note` / `:::tip` / `:::caution` / `:::danger`。
 - 术语统一参照 `GLOSSARY.md`；架构决策记录见 `docs/adr/`。
 
+## 快速提交
+
+- **网页提交**：站点首页"提交文档"按钮 → GitHub Issue 表单 → CI 自动转 PR
+- **CLI 提交**：`npm install -g @qianli2027/eabi-debug-cli` → `eabi-debug submit <file.md>`
+- **飞书集成**：见 [飞书集成配置指南](./docs/飞书集成配置指南.md)
+
 ## 提交规则
 
 - 提交规范（分支、commit message、front matter、CI 门禁）：[CONTRIBUTING.md](./CONTRIBUTING.md)

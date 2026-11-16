@@ -1,0 +1,17 @@
+{
+  "name": "@qianli2027/eabi-debug-cli",
+  "version": "0.1.0",
+  "description": "电控调试指南快速提交 CLI",
+  "type": "module",
+  "bin": {
+    "eabi-debug": "./bin/eabi-debug.js"
+  },
+  "files": [
+    "bin",
+    "lib"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

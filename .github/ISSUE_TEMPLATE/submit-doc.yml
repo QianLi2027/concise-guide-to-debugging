@@ -1,0 +1,102 @@
+name: 提交调试文档
+description: 提交一篇新的电控调试疑难文档（电机/通信协议/控制算法/石山代码）
+title: "[提交] "
+labels: ["needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢贡献调试经验！请按以下模板填写，CI 会自动将本 Issue 转为 PR 入库。
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 分类
+      description: 这篇文档属于哪个分类？
+      options:
+        - 电机
+        - 通信协议
+        - 控制算法
+        - 石山代码
+    validations:
+      required: true
+
+  - type: input
+    id: title
+    attributes:
+      label: 文档标题
+      description: 一句话说清问题，会显示在侧边栏和搜索
+      placeholder: 例如：RS485 半双工收发切换时序冲突
+    validations:
+      required: true
+
+  - type: input
+    id: description
+    attributes:
+      label: 简述
+      description: 20-50 字，说清"什么现象、什么原因"
+      placeholder: 例如：在 115200 波特率下，RS485 收发使能引脚切换过快导致首字节丢失
+    validations:
+      required: true
+
+  - type: input
+    id: authors
+    attributes:
+      label: 作者 GitHub 用户名
+      description: 首次写这篇的人，多个用逗号分隔
+      placeholder: 例如：cmz488
+    validations:
+      required: true
+
+  - type: input
+    id: maintainers
+    attributes:
+      label: 维护者 GitHub 用户名
+      description: 负责答疑的人，多个用逗号分隔
+      placeholder: 例如：cmz488
+    validations:
+      required: true
+
+  - type: textarea
+    id: body_content
+    attributes:
+      label: 正文
+      description: 按"现象→排查过程→根因→解决方案→验证"结构写，支持 Markdown
+      placeholder: |
+        ## 现象
+
+        ## 排查过程
+
+        ## 根因
+
+        ## 解决方案
+
+        ## 验证
+      value: |
+        ## 现象
+
+        ## 排查过程
+
+        ## 根因
+
+        ## 解决方案
+
+        ## 验证
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: outdated
+    attributes:
+      label: 是否已过期
+      options:
+        - label: 本文档内容已过时（页面顶部会出现红色警示横幅）
+          required: false
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: 附件（可选）
+      description: 拖拽上传 md 文件、图片、日志等附件，或粘贴图片链接
+      placeholder: 拖拽文件到此处上传
