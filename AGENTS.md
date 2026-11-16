@@ -1,18 +1,51 @@
-# 项目说明
+# 电控调试简明指南
 
-本项目收录电控调试时所遇见的疑难杂症--包括但不限于电机用户文档与实际情况不一致、各种通信问题、编写代码时踩的坑--以避免一些重复问题的出现，提供调试人员的效率
+本项目收录电控调试时所遇见的疑难杂症——包括但不限于电机用户文档与实际情况不一致、各种通信问题、编写代码时踩的坑——以避免重复问题的出现，提高调试人员的效率。
 
+站点基于 Astro Starlight 构建，Rust Book 式网页浏览体验。
 
-# 编写规则
+## 编写规则
 
-1. 本项目采用markdown文档方式编写
-2. 采用电机，通信协议，控制算法，石山代码分类，如果有新分类后续添加
-3. md采用yaml头提交元信息，元信息包括：分类，编写以及维护人员，最后修改时间，是否过期，如果后续有新的元信息，再添加
+1. 文档采用 Markdown/MDX 编写，按分类放入 `src/content/docs/` 下对应目录：
+   - `电机/` —— 电机本体、驱动器、用户手册不一致、参数整定、烧录调试
+   - `通信协议/` —— CAN、RS485、UART、SPI、I2C、以太网、Modbus 等
+   - `控制算法/` —— PID、FOC、滤波器、状态观测器、轨迹规划等
+   - `石山代码/` —— 历史遗留、芯片 errata、编译器行为、RTOS 时序玄学 bug
+2. 文件名用 kebab-case（如 `rs485-收发时序冲突.md`），图片放 `src/assets/images/<分类>/`，单张不超过 2 MB。
+3. 每篇文档必须带 YAML front matter，必需字段：
 
+   ```yaml
+   ---
+   title: 页面标题
+   description: 一句话说清问题
+   authors: ['github-用户名']
+   maintainers: ['github-用户名']
+   lastUpdated: 2025-11-16
+   outdated: false
+   ---
+   ```
 
-# 提交规则
+   - `outdated: true` 时页面顶部出现红色过期警示横幅。
+   - 首页 `index.mdx` 豁免 authors/maintainers 等字段。
+   - 可选字段：`tags`、`sidebar.order`。
+4. 提交前本地跑 `pnpm validate` 自查；CI 会强制门禁，详见 `scripts/validate.mjs`。
 
-详见[CONTRIBUTING.md](./CONTRIBUTING.md)
+## 常用命令
+
+- `pnpm dev` —— 本地预览（后台用 `pnpm astro dev --background`，配合 `status`/`stop`/`logs`）
+- `pnpm build` —— 构建静态站点到 `dist/`
+- `pnpm validate` —— front matter / 分类 / 图片门禁
+- `pnpm check` —— Astro 类型检查
+
+## 文档写作要点
+
+- 结构建议：现象 → 排查过程 → 根因 → 解决方案 → 验证。
+- 警示用 Starlight aside：`:::note` / `:::tip` / `:::caution` / `:::danger`。
+- 术语统一参照 `GLOSSARY.md`；架构决策记录见 `docs/adr/`。
+
+## 提交规则
+
+详见 [README.md](./README.md) 的贡献指南章节。
 
 ## Agent skills
 
@@ -27,4 +60,3 @@ issue 与 spec 以 markdown 文件存放在本仓库 `.scratch/` 下。详见 `d
 ### Domain docs
 
 单上下文（single-context）：根目录 `GLOSSARY.md` + `docs/adr/`。详见 `docs/agents/domain.md`。
-
