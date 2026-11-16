@@ -1,15 +1,12 @@
 ---
 title: 电控调试简明指南
-description: 电机、通信协议、控制算法、石山代码的疑难杂症速查
+description: 电控调试疑难杂症速查：从现象到根因的排障推理链
 template: splash
 hero:
   tagline: 收录电控调试中遇到的疑难杂症，避免重复踩坑
   image:
     file: ../../assets/houston.webp
   actions:
-    - text: 开始查阅
-      link: /concise-guide-to-debugging/电机/达妙-can-id-手册不符/
-      icon: right-arrow
     - text: 提交文档
       link: https://github.com/QianLi2027/concise-guide-to-debugging/issues/new?template=submit-doc.yml
       icon: add-document
@@ -22,27 +19,41 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-## 分类
+## 按症状检索
+
+带着问题来，不是带着分类来。找到与你现象最接近的入口：
 
 <CardGrid stagger>
-	<Card title="硬件" icon="puzzle">
-		分电板、线束、接插件、供电与物理层接线等硬件问题。
+	<Card title="电机不转 / 抖动 / 异响" icon="setting">
+		驱动器无应答、参数整定发散、用户手册与实物不一致。
+		<a href="/concise-guide-to-debugging/电机/">浏览电机案例 →</a>
 	</Card>
-	<Card title="电机" icon="setting">
-		电机本体、驱动器、用户手册与实物不一致、参数整定、烧录调试问题。
+	<Card title="通信超时 / 丢包 / 时序冲突" icon="comment">
+		CAN ID 不符、RS485 首字节丢失、波特率不匹配。
+		<a href="/concise-guide-to-debugging/通信协议/">浏览通信案例 →</a>
 	</Card>
-	<Card title="通信协议" icon="comment">
-		CAN、RS485、UART、SPI、I2C、以太网、Modbus 等物理层到应用层的疑难杂症。
+	<Card title="算法发散 / 振荡 / 不收敛" icon="rocket">
+		PID 参数整定、FOC 电流环振荡、滤波器相位滞后。
+		<a href="/concise-guide-to-debugging/控制算法/">浏览算法案例 →</a>
 	</Card>
-	<Card title="控制算法" icon="rocket">
-		PID、FOC、滤波器、状态观测器、轨迹规划等算法实现与调参踩坑。
-	</Card>
-	<Card title="石山代码" icon="warning">
-		历史遗留、芯片 errata、编译器行为、RTOS 时序引发的"玄学" bug 与 workaround。
+	<Card title="玄学 bug / 编译器行为 / 时序" icon="warning">
+		芯片 errata、RTOS 时序、Flash 双 bank 切换 HardFault。
+		<a href="/concise-guide-to-debugging/石山代码/">浏览石山代码 →</a>
 	</Card>
 </CardGrid>
 
+## 排障方法论
+
+每篇文档遵循相同的推理链：**现象 → 排查过程 → 根因 → 解决方案 → 验证**。
+
+这不是 Wiki，是**可复现的排障记录**。每篇都包含：
+- 示波器/逻辑分析仪截图或日志证据
+- 完整的排查步骤（可复现）
+- 根因分析（为什么，不是是什么）
+- 验证数据（修复后的实测结果）
+
 ## 贡献方式
 
-点击任意页面右上角"在 GitHub 编辑此页"即可在线提交修改，无需安装任何环境。
-本地预览请见 [README](https://github.com/QianLi2027/concise-guide-to-debugging#readme)。
+点击任意页面右上角 **"在 GitHub 编辑此页"** 在线提交修改，无需安装任何环境。
+
+本地快速提交请见 [README](https://github.com/QianLi2027/concise-guide-to-debugging#readme) 的 CLI 章节。
