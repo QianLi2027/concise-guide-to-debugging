@@ -45,7 +45,8 @@
 
 ## 提交规则
 
-详见 [README.md](./README.md) 的贡献指南章节。
+- 提交规范（分支、commit message、front matter、CI 门禁）：[CONTRIBUTING.md](./CONTRIBUTING.md)
+- 在线修改规范（浏览器零门槛路径）：[docs/在线修改规范.md](./docs/在线修改规范.md)
 
 ## Agent skills
 

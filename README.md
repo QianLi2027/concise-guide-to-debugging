@@ -74,3 +74,8 @@ tags: ['rs485', '时序']       # 可选
 | `lastUpdated` 超过 180 天且未标过期 | ⚠️ 警告 |
 
 push 到 `main` 后，GitHub Actions 自动跑门禁并部署到 Pages。
+
+## 规范文档
+
+- **提交规范**：[CONTRIBUTING.md](./CONTRIBUTING.md) —— 分支策略、commit message 格式、front matter 契约、CI 门禁
+- **在线修改规范**：[docs/在线修改规范.md](./docs/在线修改规范.md) —— 浏览器零门槛贡献路径

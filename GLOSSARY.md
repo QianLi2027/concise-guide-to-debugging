@@ -25,4 +25,5 @@
 |---|---|
 | **editUrl** | Starlight 生成的"在 GitHub 编辑此页"链接，指向仓库 `edit/main/src/content/docs/...`，支撑浏览器零门槛贡献路径 |
 | **Pagefind** | Starlight 默认搜索后端，构建时对 `dist/` 静态 HTML 建索引，无需服务端 |
+| **顺带改动** | PR 中包含的与主题无关的格式化、链接修复、依赖升级等，必须在 PR 描述里单独列出 |
 | **autogenerate** | Starlight 侧边栏机制，按 `src/content/docs/` 目录结构自动推导分组与顺序，无需手写 SUMMARY |
