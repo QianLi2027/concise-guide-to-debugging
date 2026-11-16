@@ -37,6 +37,7 @@ jobs:
             };
 
             const category = getField('分类');
+            const subcategory = getField('子分类');
             const title = getField('文档标题');
             const description = getField('简述');
             const authorsRaw = getField('作者 GitHub 用户名');
@@ -47,11 +48,6 @@ jobs:
               '[x] 本文档内容已过时'
             );
 
-            // 附件内容追加到正文末尾，避免链接丢失
-            const fullContent = attachments
-              ? content + '\n\n## 附件\n\n' + attachments
-              : content;
-
             const authors = authorsRaw
               .split(',')
               .map(s => s.trim())
@@ -61,9 +57,13 @@ jobs:
               .map(s => s.trim())
               .filter(Boolean);
 
-            const valid = ['电机','通信协议','控制算法','石山代码'];
-            if (!valid.includes(category)) {
-              core.setFailed('分类无效: ' + category);
+            // 软警告：建议使用现有分类，但不阻断
+            const knownCategories = ['电机','通信协议','控制算法','石山代码'];
+            if (!knownCategories.includes(category)) {
+              core.warning(
+                '分类 "' + category + '" 不在现有四大分类中，' +
+                '将创建新分类目录。建议使用现有分类以保持内容组织一致。'
+              );
             }
 
             const slug = title
@@ -87,11 +87,16 @@ jobs:
               '---',
             ].join('\n');
 
+            const fullContent = attachments
+              ? content + '\n\n## 附件\n\n' + attachments
+              : content;
             const full = fm + '\n\n' + fullContent;
 
             const fs = require('fs');
-            const path =
-              'src/content/docs/' + category + '/' + slug + '.md';
+            const basePath = 'src/content/docs/' + category;
+            const path = subcategory
+              ? basePath + '/' + subcategory + '/' + slug + '.md'
+              : basePath + '/' + slug + '.md';
             fs.mkdirSync(require('path').dirname(path), {
               recursive: true,
             });
@@ -100,6 +105,7 @@ jobs:
             core.setOutput('path', path);
             core.setOutput('title', title);
             core.setOutput('category', category);
+            core.setOutput('subcategory', subcategory);
             core.setOutput('slug', slug);
             core.setOutput('issue_number', issue.number);
 

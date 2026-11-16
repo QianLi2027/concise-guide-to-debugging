@@ -1,5 +1,5 @@
 name: 提交调试文档
-description: 提交一篇新的电控调试疑难文档（电机/通信协议/控制算法/石山代码）
+description: 提交一篇新的电控调试疑难文档
 title: "[提交] "
 labels: ["needs-triage"]
 assignees: []
@@ -9,18 +9,25 @@ body:
       value: |
         感谢贡献调试经验！请按以下模板填写，CI 会自动将本 Issue 转为 PR 入库。
 
-  - type: dropdown
+        **分类说明**：分类和子分类完全自定义，但建议使用现有分类（电机/通信协议/控制算法/石山代码）以保持内容组织一致。
+
+  - type: input
     id: category
     attributes:
       label: 分类
-      description: 这篇文档属于哪个分类？
-      options:
-        - 电机
-        - 通信协议
-        - 控制算法
-        - 石山代码
+      description: 文档所属分类（自定义，建议用现有分类）
+      placeholder: 例如：通信协议
     validations:
       required: true
+
+  - type: input
+    id: subcategory
+    attributes:
+      label: 子分类
+      description: 文档所属子分类（自定义，可留空）
+      placeholder: 例如：RS485
+    validations:
+      required: false
 
   - type: input
     id: title

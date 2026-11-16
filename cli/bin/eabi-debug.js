@@ -9,7 +9,7 @@ import path from 'node:path';
 
 
 
-const CATEGORIES = ['电机', '通信协议', '控制算法', '石山代码'];
+const KNOWN_CATEGORIES = ['电机', '通信协议', '控制算法', '石山代码'];
 const REPO = 'QianLi2027/concise-guide-to-debugging';
 
 const USAGE = `eabi-debug - 电控调试指南快速提交 CLI
@@ -22,12 +22,16 @@ const USAGE = `eabi-debug - 电控调试指南快速提交 CLI
 
 选项:
   --dry-run                     只校验不提交（submit 时可用）
-  --category <分类>             强制指定分类（覆盖 front matter）
+  --category <分类>             强制指定分类（覆盖目录检测）
   --branch <分支名>             自定义分支名（默认 submit/<slug>-<timestamp>）
 
+文档路径要求:
+  文件必须位于 src/content/docs/<分类>/ 或 src/content/docs/<分类>/<子分类>/ 目录下。
+  分类和子分类完全自定义，但建议使用现有分类（电机/通信协议/控制算法/石山代码）。
+
 示例:
-  eabi-debug submit ./rs485-时序冲突.md
-  eabi-debug validate ./新文档.md
+  eabi-debug submit src/content/docs/通信协议/RS485/时序冲突.md
+  eabi-debug validate src/content/docs/新分类/新文档.md
   eabi-debug login
 `;
 
@@ -106,9 +110,19 @@ function validateDoc(file) {
     warnings.push('本文档已标记过期 (outdated: true)');
   }
 
-  const category = path.basename(path.dirname(file));
-  if (!CATEGORIES.includes(category)) {
-    errors.push(`文件必须位于四个分类目录之一: ${CATEGORIES.join('/')}`);
+  const relPath = path.relative(process.cwd(), file);
+  const parts = relPath.split(path.sep);
+  const docsIndex = parts.indexOf('docs');
+  
+  let category = null;
+  if (docsIndex !== -1 && docsIndex + 1 < parts.length) {
+    category = parts[docsIndex + 1];
+  }
+
+  if (!category) {
+    errors.push('文件必须位于 src/content/docs/<分类>/ 目录下');
+  } else if (!KNOWN_CATEGORIES.includes(category)) {
+    warnings.push(`分类 "${category}" 不在现有四大分类中，将创建新分类目录`);
   }
 
   return { errors, warnings, data };
@@ -136,19 +150,34 @@ function cmdSubmit(file, opts) {
     error(`校验失败: ${errors.length} 个错误`);
   }
 
-  const category = opts.category || path.basename(path.dirname(file));
+  const relPath = path.relative(process.cwd(), file);
+  const parts = relPath.split(path.sep);
+  const docsIndex = parts.indexOf('docs');
+  
+  let category = opts.category;
+  let subcategory = null;
+  if (!category && docsIndex !== -1 && docsIndex + 1 < parts.length) {
+    category = parts[docsIndex + 1];
+    if (docsIndex + 2 < parts.length && parts[docsIndex + 2] !== path.basename(file)) {
+      subcategory = parts[docsIndex + 2];
+    }
+  }
+  
   const slug = path.basename(file, '.md');
   const branch = opts.branch || `submit/${slug}-${Date.now()}`;
 
   if (opts.dryRun) {
     log('🔍 dry-run 模式，不执行提交');
     log(`   分类: ${category}`);
+    if (subcategory) log(`   子分类: ${subcategory}`);
     log(`   分支: ${branch}`);
     log(`   标题: ${data.title}`);
     return;
   }
 
   log('开始提交...');
+  log(`   分类: ${category}`);
+  if (subcategory) log(`   子分类: ${subcategory}`);
   run('git', ['checkout', '-b', branch]);
   run('git', ['add', file]);
   run('git', ['commit', '-m', `feat(${category}): ${data.title}`]);
