@@ -9,7 +9,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: '电控调试简明指南',
-			description: '电控调试疑难杂症速查手册：电机、通信协议、控制算法、石山代码',
+			description: '电控调试疑难杂症速查手册：硬件、电机、通信协议、控制算法、石山代码',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/QianLi2027/concise-guide-to-debugging' }],
 			editLink: {
 				baseUrl: 'https://github.com/QianLi2027/concise-guide-to-debugging/edit/main/',
@@ -20,6 +20,10 @@ export default defineConfig({
 			},
 			lastUpdated: true,
 			sidebar: [
+				{
+					label: '硬件',
+					items: [{ autogenerate: { directory: '硬件', collapsed: false } }],
+				},
 				{
 					label: '电机',
 					items: [{ autogenerate: { directory: '电机', collapsed: false } }],

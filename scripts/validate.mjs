@@ -13,8 +13,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS_DIR = path.join(ROOT, 'src/content/docs');
 const ASSETS_DIR = path.join(ROOT, 'src/assets');
 
-/** 允许的顶级分类目录（目录即分类） */
-const CATEGORIES = ['电机', '通信协议', '控制算法', '石山代码'];
+/** 分类目录完全自定义，但文档必须落在 src/content/docs/<分类>/ 之下 */
+const MIN_CATEGORY_DEPTH = 2;
 
 /** front matter 必需字段（首页/索引页豁免，见 isIndexPage） */
 const REQUIRED_FIELDS = ['title', 'description', 'authors', 'maintainers', 'lastUpdated', 'outdated'];
@@ -74,9 +74,8 @@ function checkFrontmatter(file, rel) {
 
 function checkCategory(rel) {
   if (isIndexPage(rel)) return;
-  const topDir = rel.split(path.sep)[0];
-  if (!CATEGORIES.includes(topDir)) {
-    errors.push(`${rel}: 文件必须位于四个分类目录之一 (${CATEGORIES.join('/')})，当前位于 "${topDir}"`);
+  if (rel.split(path.sep).length < MIN_CATEGORY_DEPTH) {
+    errors.push(`${rel}: 文件必须位于 src/content/docs/<分类>/ 目录下，不能直接放在 docs 根目录`);
   }
 }
 
@@ -93,9 +92,9 @@ function checkImageRefs(file, rel) {
   const refs = new Set();
   const mdImg = /!\[[^\]]*\]\(([^)\s]+)[^)]*\)/g;
   const htmlImg = /<img[^>]+src=["']([^"']+)["']/g;
-  let m;
-  while ((m = mdImg.exec(content))) refs.add(m[1]);
-  while ((m = htmlImg.exec(content))) refs.add(m[1]);
+  for (const re of [mdImg, htmlImg]) {
+    for (let m = re.exec(content); m; m = re.exec(content)) refs.add(m[1]);
+  }
 
   for (const ref of refs) {
     const abs = resolveAssetRef(ref, path.dirname(file));

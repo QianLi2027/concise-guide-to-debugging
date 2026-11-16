@@ -9,7 +9,7 @@ import path from 'node:path';
 
 
 
-const KNOWN_CATEGORIES = ['电机', '通信协议', '控制算法', '石山代码'];
+const KNOWN_CATEGORIES = ['硬件', '电机', '通信协议', '控制算法', '石山代码'];
 const REPO = 'QianLi2027/concise-guide-to-debugging';
 
 const USAGE = `eabi-debug - 电控调试指南快速提交 CLI
@@ -27,7 +27,7 @@ const USAGE = `eabi-debug - 电控调试指南快速提交 CLI
 
 文档路径要求:
   文件必须位于 src/content/docs/<分类>/ 或 src/content/docs/<分类>/<子分类>/ 目录下。
-  分类和子分类完全自定义，但建议使用现有分类（电机/通信协议/控制算法/石山代码）。
+  分类和子分类完全自定义，但建议使用现有分类（硬件/电机/通信协议/控制算法/石山代码）。
 
 示例:
   eabi-debug submit src/content/docs/通信协议/RS485/时序冲突.md
@@ -122,7 +122,7 @@ function validateDoc(file) {
   if (!category) {
     errors.push('文件必须位于 src/content/docs/<分类>/ 目录下');
   } else if (!KNOWN_CATEGORIES.includes(category)) {
-    warnings.push(`分类 "${category}" 不在现有四大分类中，将创建新分类目录`);
+    warnings.push(`分类 "${category}" 不在现有分类中，将创建新分类目录`);
   }
 
   return { errors, warnings, data };
