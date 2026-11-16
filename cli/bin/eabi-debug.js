@@ -51,6 +51,30 @@ function checkGh() {
   }
 }
 
+function getRepoRoot() {
+  const r = spawnSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' });
+  if (r.status !== 0) error('当前目录不在 git 仓库内，无法定位仓库根');
+  return r.stdout.trim();
+}
+
+function repoRelative(file) {
+  return path.relative(getRepoRoot(), path.resolve(file));
+}
+
+/** 未提交改动会被一起带进 PR，提交前要求工作区干净（目标文档本身除外） */
+function assertCleanWorktree(target) {
+  const rel = repoRelative(target);
+  const r = spawnSync('git', ['status', '--porcelain'], { cwd: getRepoRoot(), encoding: 'utf8' });
+  const dirty = r.stdout
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => line.slice(3).trim().split(' -> ').pop())
+    .filter((p) => p !== rel);
+  if (dirty.length > 0) {
+    error(`工作区有未提交改动，请先提交或 stash:\n${dirty.map((p) => `  ${p}`).join('\n')}`);
+  }
+}
+
 function run(cmd, args, opts = {}) {
   const r = spawnSync(cmd, args, { stdio: 'inherit', ...opts });
   if (r.status !== 0) {
@@ -110,10 +134,9 @@ function validateDoc(file) {
     warnings.push('本文档已标记过期 (outdated: true)');
   }
 
-  const relPath = path.relative(process.cwd(), file);
-  const parts = relPath.split(path.sep);
+  const parts = repoRelative(file).split(path.sep);
   const docsIndex = parts.indexOf('docs');
-  
+
   let category = null;
   if (docsIndex !== -1 && docsIndex + 1 < parts.length) {
     category = parts[docsIndex + 1];
@@ -150,10 +173,9 @@ function cmdSubmit(file, opts) {
     error(`校验失败: ${errors.length} 个错误`);
   }
 
-  const relPath = path.relative(process.cwd(), file);
-  const parts = relPath.split(path.sep);
+  const parts = repoRelative(file).split(path.sep);
   const docsIndex = parts.indexOf('docs');
-  
+
   let category = opts.category;
   let subcategory = null;
   if (!category && docsIndex !== -1 && docsIndex + 1 < parts.length) {
@@ -174,6 +196,8 @@ function cmdSubmit(file, opts) {
     log(`   标题: ${data.title}`);
     return;
   }
+
+  assertCleanWorktree(file);
 
   log('开始提交...');
   log(`   分类: ${category}`);
