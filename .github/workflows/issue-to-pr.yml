@@ -42,9 +42,15 @@ jobs:
             const authorsRaw = getField('作者 GitHub 用户名');
             const maintainersRaw = getField('维护者 GitHub 用户名');
             const content = getField('正文');
+            const attachments = getField('附件（可选）');
             const outdatedChecked = body.includes(
               '[x] 本文档内容已过时'
             );
+
+            // 附件内容追加到正文末尾，避免链接丢失
+            const fullContent = attachments
+              ? content + '\n\n## 附件\n\n' + attachments
+              : content;
 
             const authors = authorsRaw
               .split(',')
@@ -81,7 +87,7 @@ jobs:
               '---',
             ].join('\n');
 
-            const full = fm + '\n\n' + content;
+            const full = fm + '\n\n' + fullContent;
 
             const fs = require('fs');
             const path =
