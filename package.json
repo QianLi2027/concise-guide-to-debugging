@@ -1,6 +1,7 @@
 {
   "name": "concise-guide-to-debugging",
   "type": "module",
+  "packageManager": "pnpm@12.3.4",
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
