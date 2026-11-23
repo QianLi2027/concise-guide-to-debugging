@@ -2,7 +2,7 @@ name: Issue 转 PR
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened, edited, labeled]
 
 permissions:
   contents: write
@@ -29,11 +29,12 @@ jobs:
 
             const getField = (name) => {
               const re = new RegExp(
-                '### ' + name + '\n+([\s\S]*?)(?=\n### |$)',
+                '### ' + name + '\n+([\\s\\S]*?)(?=\n### |$)',
                 'i'
               );
               const m = body.match(re);
-              return m ? m[1].trim() : '';
+              const value = m ? m[1].trim() : '';
+              return /^_No response_$/i.test(value) ? '' : value;
             };
 
             const category = getField('分类');
