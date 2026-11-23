@@ -34,6 +34,8 @@ jobs:
         run: pnpm check
       - name: 构建
         run: pnpm build
+      - name: 校验分类索引
+        run: pnpm verify:indexes
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

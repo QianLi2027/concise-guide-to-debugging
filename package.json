@@ -8,6 +8,7 @@
     "start": "astro dev",
     "build": "astro build",
     "validate": "node scripts/validate.mjs",
+    "verify:indexes": "node scripts/verify-indexes.mjs",
     "check": "astro check",
     "preview": "astro preview",
     "astro": "astro"
