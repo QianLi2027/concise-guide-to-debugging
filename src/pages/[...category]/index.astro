@@ -12,9 +12,12 @@ export async function getStaticPaths() {
 	const categories = new Set<string>();
 
 	for (const entry of entries) {
-		const [category, ...rest] = normalizeId(entry.id).split('/');
-		if (!category || rest.length === 0) continue;
-		categories.add(category);
+		const segments = normalizeId(entry.id).split('/');
+		let current = '';
+		for (const segment of segments.slice(0, -1)) {
+			current = current ? `${current}/${segment}` : segment;
+			categories.add(current);
+		}
 	}
 
 	return [...categories]
@@ -28,12 +31,13 @@ export async function getStaticPaths() {
 }
 
 const { category } = Astro.props;
+const title = category.split('/').at(-1) ?? category;
 ---
 
 <StarlightPage
 	frontmatter={{
-		title: category,
-		description: `${category}分类下的调试文档`,
+		title,
+		description: `${category} 分类下的调试文档`,
 	}}
 >
 	<p>该分类尚未提供手工索引页，以下入口由构建过程自动生成。</p>
