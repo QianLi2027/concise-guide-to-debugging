@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import CategoryIndex from '../../components/CategoryIndex.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export async function getStaticPaths() {
+	const normalizeId = (id: string) => id.replace(/\.(md|mdx)$/, '');
+	const entries = await getCollection('docs');
+	const docsDir = path.resolve('src/content/docs');
+	const categories = new Set<string>();
+
+	for (const entry of entries) {
+		const segments = normalizeId(entry.id).split('/');
+		let current = '';
+		for (const segment of segments.slice(0, -1)) {
+			current = current ? `${current}/${segment}` : segment;
+			categories.add(current);
+		}
+	}
+
+	return [...categories]
+		.filter(
+			(category) =>
+				!['index.md', 'index.mdx'].some((file) =>
+					fs.existsSync(path.join(docsDir, category, file))
+				)
+		)
+		.map((category) => ({ params: { category }, props: { category } }));
+}
+
+const { category } = Astro.props;
+const title = category.split('/').at(-1) ?? category;
+---
+
+<StarlightPage
+	frontmatter={{
+		title,
+		description: `${category} 分类下的调试文档`,
+	}}
+>
+	<p>该分类尚未提供手工索引页，以下入口由构建过程自动生成。</p>
+	<CategoryIndex category={category} />
+</StarlightPage>

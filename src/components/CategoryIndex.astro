@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+	category: string;
+}
+
+const { category } = Astro.props;
+const normalizeId = (id: string) => id.replace(/\.(md|mdx)$/, '');
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
+const docs = (await getCollection('docs'))
+	.filter((entry) => {
+		const id = normalizeId(entry.id);
+		return id.startsWith(`${category}/`) && id !== `${category}/index`;
+	})
+	.map((entry) => ({
+		id: normalizeId(entry.id),
+		title: entry.data.title,
+		description: entry.data.description,
+	}))
+	.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+---
+
+<ul>
+	{docs.map((doc) => (
+		<li>
+			<a href={`${base}${doc.id}/`}>{doc.title}</a>
+			{doc.description && <p>{doc.description}</p>}
+		</li>
+	))}
+</ul>
